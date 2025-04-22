@@ -1,14 +1,14 @@
 #!/bin/tcsh
 
-# DESC: GTKYD check (will **disable** slurm/swarm for this cmd)
+# DESC: process anatomicals by deobliquing and refacing
 
-# Process a single subj. Run it from its partner run*.tcsh script.
+# Process a single subj+ses pair. Run it from its partner run*.tcsh script.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
 
 # ---------------------------------------------------------------------------
 
 # use slurm? 1 = yes, 0 = no (def: use if available)
-set use_slurm = 0 ###$?SLURM_CLUSTER_NAME
+set use_slurm = $?SLURM_CLUSTER_NAME
 
 # ----------------------------- biowulf-cmd ---------------------------------
 if ( $use_slurm ) then
@@ -38,11 +38,21 @@ set subj           = $1
 set dir_inroot     = ${PWD:h}                        # one dir above scripts/
 set dir_log        = ${dir_inroot}/logs
 set dir_basic      = ${dir_inroot}/data_00_basic
-set dir_gtkyd      = ${dir_inroot}/data_01_gtkyd
+set dir_deob_face  = ${dir_inroot}/data_02_deob_face
+
+# subject directories
+set sdir_basic     = ${dir_basic}/${subj}
+set sdir_func      = ${sdir_basic}/func
+set sdir_anat      = ${sdir_basic}/anat
+set sdir_deob_face = ${dir_deob_face}/${subj}
+
+# supplementary directory (reference data, etc.)
+###set dir_suppl      = ${dir_inroot}/supplements
+### set template       = ${dir_suppl}/*****
 
 # set output directory
-set sdir_out = ${dir_gtkyd}
-set lab_out  = gtkyd
+set sdir_out = ${sdir_deob_face}
+set lab_out  = deob_face
 
 # --------------------------------------------------------------------------
 # data and control variables
@@ -50,11 +60,12 @@ set lab_out  = gtkyd
 
 # dataset inputs
 
-# jump to group dir of unproc'essed data
-cd ${dir_basic}
-set all_epi  = `find ./sub* -name "sub*task*bold*.nii.gz" | cut -b3- | sort`
-set all_anat = `find ./sub* -name "sub*T1w*.nii.gz" | cut -b3- | sort`
-cd -
+set dset_anat = ( ${sdir_anat}/${subj}_T1w.nii.gz )
+set json_anat = ( ${sdir_anat}/${subj}_T1w.json )
+
+# control variables
+
+# ***** provide relevant paths to control parameters
 
 
 # check available N_threads and report what is being used
@@ -84,67 +95,31 @@ endif
 # run programs
 # ---------------------------------------------------------------------------
 
-# make output directory
+# make output directory and go to it
 \mkdir -p ${sdir_out}
+cd ${sdir_out}
 
-# jump to same dir_basic as above so read-in file paths are the same
-cd ${dir_basic}
+\cp ${json_anat} .
 
-# ----- check EPI
-
-# make table+supplements of all dsets
-gtkyd_check.py                                       \
-    -do_minmax                                       \
-    -infiles    ${all_epi}                           \
-    -outdir     ${sdir_out}/all_epi
+# deoblique the anat (no regrid/blur, keep coord origin)
+adjunct_deob_around_origin                       \
+    -input   ${dset_anat}                        \
+    -prefix  ${subj}_T1w_DEOB.nii.gz
 
 if ( ${status} ) then
     set ecode = 1
     goto COPY_AND_EXIT
 endif
 
-# query supplemental files for specific properties
-gen_ss_review_table.py                               \
-    -infiles          ${sdir_out}/all_epi/dset*txt   \
-    -report_outliers  'subject ID'     SHOW          \
-    -report_outliers  'av_space'       EQ "+tlrc"    \
-    -report_outliers  'n3'             VARY          \
-    -report_outliers  'nv'             VARY          \
-    -report_outliers  'datum'          VARY          \
-    |& tee ${sdir_out}/all_epi_gssrt.dat
+# reface (along with other outputs); use shell that removes more face
+@afni_refacer_run                                  \
+    -input      ${subj}_T1w_DEOB.nii.gz            \
+    -mode_all                                      \
+    -shell      afni_refacer_shell_sym_2.0.nii.gz  \
+    -prefix     ${subj}_T1w
 
 if ( ${status} ) then
     set ecode = 2
-    goto COPY_AND_EXIT
-endif
-
-# ----- check anat
-
-# make table+supplements of all dsets
-gtkyd_check.py                                       \
-    -do_minmax                                       \
-    -infiles    ${all_anat}                          \
-    -outdir     ${sdir_out}/all_anat
-
-if ( ${status} ) then
-    set ecode = 3
-    goto COPY_AND_EXIT
-endif
-
-# query supplemental files for specific properties
-gen_ss_review_table.py                               \
-    -infiles          ${sdir_out}/all_anat/dset*txt  \
-    -report_outliers  'subject ID'     SHOW          \
-    -report_outliers  'is_oblique'     GT 0          \
-    -report_outliers  'obliquity'      GT 0          \
-    -report_outliers  'av_space'       EQ "+tlrc"    \
-    -report_outliers  'n3'             VARY          \
-    -report_outliers  'nv'             VARY          \
-    -report_outliers  'datum'          VARY          \
-    |& tee ${sdir_out}/all_anat_gssrt.dat
-
-if ( ${status} ) then
-    set ecode = 4
     goto COPY_AND_EXIT
 endif
 
