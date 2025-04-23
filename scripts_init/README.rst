@@ -16,3 +16,8 @@ Scripts to run on the raw, unprocessed data.
   the data, replacing the face with an anonymous, blurred version and
   removing ears.
 
+**do_03_slice_tree.tcsh, run_03_slice_tree.tcsh**
+
+* Insert slice timing from EPI JSON sidecars into the EPI dsets, and then
+  make new full data tree to replace '00_basic' on the HPC.  This also
+  includes copying the relevant EPI stim timing files over.
