@@ -2,7 +2,7 @@
 
 # DESC: run anat through skullstripping and warping (SSW2)
 
-# Process a single subj+ses pair. Run it from its partner run*.tcsh script.
+# Process a single subj. Run it from its partner run*.tcsh script.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
 
 # ---------------------------------------------------------------------------
