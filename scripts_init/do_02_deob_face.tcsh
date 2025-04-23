@@ -2,7 +2,7 @@
 
 # DESC: process anatomicals by deobliquing and refacing
 
-# Process a single subj+ses pair. Run it from its partner run*.tcsh script.
+# Process a single subj. Run it from its partner run*.tcsh script.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
 
 # ---------------------------------------------------------------------------
@@ -99,7 +99,8 @@ endif
 \mkdir -p ${sdir_out}
 cd ${sdir_out}
 
-\cp ${json_anat} .
+# copy anat JSON, with name to match reface output
+\cp ${json_anat} ${subj}_T1w_reface.json
 
 # deoblique the anat (no regrid/blur, keep coord origin)
 adjunct_deob_around_origin                       \
@@ -112,14 +113,23 @@ if ( ${status} ) then
 endif
 
 # reface (along with other outputs); use shell that removes more face
-@afni_refacer_run                                  \
-    -input      ${subj}_T1w_DEOB.nii.gz            \
-    -mode_all                                      \
-    -shell      afni_refacer_shell_sym_2.0.nii.gz  \
-    -prefix     ${subj}_T1w
+@afni_refacer_run                                         \
+    -anonymize_output                                     \
+    -mode_reface                                          \
+    -shell             afni_refacer_shell_sym_2.0.nii.gz  \
+    -input             ${subj}_T1w_DEOB.nii.gz            \
+    -prefix            ${subj}_T1w_reface.nii.gz
 
 if ( ${status} ) then
     set ecode = 2
+    goto COPY_AND_EXIT
+endif
+
+# clean up deob dset, bc it still has face on
+\rm ${subj}_T1w_DEOB.nii.gz
+
+if ( ${status} ) then
+    set ecode = 3
     goto COPY_AND_EXIT
 endif
 

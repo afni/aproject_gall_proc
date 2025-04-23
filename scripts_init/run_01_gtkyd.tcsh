@@ -3,7 +3,7 @@
 # DESC: GTKYD check (will **disable** slurm/swarm for this cmd)
 
 # Process one or more subjects via corresponding do_*.tcsh script,
-# looping over subj+ses pairs.
+# looping over subj.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
 
 # To execute:  
