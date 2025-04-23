@@ -1,6 +1,6 @@
 #!/bin/tcsh
 
-# DESC: process anatomicals by deobliquing and refacing
+# DESC: prepare new tree that can be moved to HPC (and do EPI slice times)
 
 # Process a single subj. Run it from its partner run*.tcsh script.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
@@ -39,19 +39,21 @@ set dir_inroot     = ${PWD:h}                        # one dir above scripts/
 set dir_log        = ${dir_inroot}/logs
 set dir_basic      = ${dir_inroot}/data_00_basic
 set dir_deob_face  = ${dir_inroot}/data_02_deob_face
+set dir_slice_tree = ${dir_inroot}/data_03_slice_tree
 
 # subject directories
 set sdir_basic     = ${dir_basic}/${subj}
 set sdir_func      = ${sdir_basic}/func
 set sdir_anat      = ${sdir_basic}/anat
 set sdir_deob_face = ${dir_deob_face}/${subj}
+set sdir_slice_tree = ${dir_slice_tree}/${subj}
 
 # supplementary directory (reference data, etc.)
 ###set dir_suppl      = ${dir_inroot}/supplements
 ### set template       = ${dir_suppl}/*****
 
 # *** set output directory
-set sdir_out = ${sdir_deob_face}
+set sdir_out = ${sdir_slice_tree}
 set lab_out  = ${sdir_out:t}
 
 # --------------------------------------------------------------------------
@@ -60,8 +62,14 @@ set lab_out  = ${sdir_out:t}
 
 # dataset inputs
 
-set dset_anat = ( ${sdir_anat}/${subj}_T1w.nii.gz )
-set json_anat = ( ${sdir_anat}/${subj}_T1w.json )
+# get anat data from reface step
+set dset_anat = ( ${sdir_deob_face}/${subj}_T1w_reface.nii.gz )
+set json_anat = ( ${dset_anat:gas/.nii.gz/.json/} )
+
+# get epi data from basic dir
+set dset_epi  = ( ${sdir_func}/${subj}*task*bold*.nii.gz )
+set json_epi  = ( ${dset_epi:gas/.nii.gz/.json/} )
+set all_stim  = ( ${sdir_func}/stim*.txt )
 
 # control variables
 
@@ -99,39 +107,43 @@ endif
 \mkdir -p ${sdir_out}
 cd ${sdir_out}
 
-# copy anat JSON, with name to match reface output
-\cp ${json_anat} ${subj}_T1w_reface.json
+# ----- anat data
 
-# deoblique the anat (no regrid/blur, keep coord origin)
-adjunct_deob_around_origin                       \
-    -input   ${dset_anat}                        \
-    -prefix  ${subj}_T1w_DEOB.nii.gz
+\mkdir -p anat
+
+# copy data over
+\cp ${dset_anat} ${json_anat} anat/.
 
 if ( ${status} ) then
     set ecode = 1
     goto COPY_AND_EXIT
 endif
 
-# reface (along with other outputs); use shell that removes more face
-@afni_refacer_run                                         \
-    -anonymize_output                                     \
-    -mode_reface                                          \
-    -shell             afni_refacer_shell_sym_2.0.nii.gz  \
-    -input             ${subj}_T1w_DEOB.nii.gz            \
-    -prefix            ${subj}_T1w_reface.nii.gz
+# ----- epi data
+
+\mkdir -p func
+
+# copy data over
+\cp ${dset_epi} ${json_epi} ${all_stim} func/.
 
 if ( ${status} ) then
     set ecode = 2
     goto COPY_AND_EXIT
 endif
 
-# clean up deob dset, bc it still has face on
-\rm ${subj}_T1w_DEOB.nii.gz
+# slice timing
+cd func 
+abids_tool.py                       \
+    -add_slice_times                \
+    -input            ${dset_epi}
 
 if ( ${status} ) then
     set ecode = 3
     goto COPY_AND_EXIT
 endif
+
+# just for fun, display slice times
+3dinfo -slice_timing -prefix ${dset_epi}
 
 echo "++ FINISHED ${lab_out}"
 

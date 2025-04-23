@@ -40,9 +40,9 @@ set dir_log        = ${dir_inroot}/logs
 set dir_basic      = ${dir_inroot}/data_00_basic
 set dir_gtkyd      = ${dir_inroot}/data_01_gtkyd
 
-# set output directory
+# *** set output directory
 set sdir_out = ${dir_gtkyd}
-set lab_out  = gtkyd
+set lab_out  = ${sdir_out:t}
 
 # --------------------------------------------------------------------------
 # data and control variables
