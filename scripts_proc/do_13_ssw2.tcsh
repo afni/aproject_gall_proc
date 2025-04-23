@@ -1,6 +1,6 @@
 #!/bin/tcsh
 
-# DESC: process anatomicals by deobliquing and refacing
+# DESC: run anat through skullstripping and warping (SSW2)
 
 # Process a single subj+ses pair. Run it from its partner run*.tcsh script.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
@@ -44,7 +44,6 @@ set dir_ssw2       = ${dir_inroot}/data_13_ssw2
 set sdir_basic     = ${dir_basic}/${subj}
 set sdir_func      = ${sdir_basic}/func
 set sdir_anat      = ${sdir_basic}/anat
-set sdir_deob_face = ${dir_deob_face}/${subj}
 set sdir_ssw2      = ${dir_ssw2}/${subj}
 
 # supplementary directory (reference data, etc.)
