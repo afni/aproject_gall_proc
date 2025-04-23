@@ -96,7 +96,7 @@ if ( $use_slurm ) then
         --threads-per-process=8                                    \
         --gb-per-process=10                                        \
         --time=01:00:00                                            \
-        --gres=lscratch:10                                         \
+        --gres=lscratch:50                                         \
         --logdir=${cdir_log}                                       \
         --job-name=job_${cmd}                                      \
         --merge-output                                             \

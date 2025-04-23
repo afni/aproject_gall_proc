@@ -147,7 +147,6 @@ afni_proc.py                                                                 \
     -volreg_compute_tsnr      yes                                            \
     -mask_epi_anat            yes                                            \
     -blur_size                ${blur_size}                                   \
-    -blur_in_mask             yes                                            \
     -regress_stim_times       ${sdir_func}/stim_imagine.txt                  \
                               ${sdir_func}/stim_press.txt                    \
     -regress_stim_labels      imagine  press                                 \
