@@ -95,7 +95,7 @@ if ( $use_slurm ) then
         --partition=norm,quick                                     \
         --threads-per-process=16                                   \
         --gb-per-process=10                                        \
-        --time=02:29:00                                            \
+        --time=03:59:00                                            \
         --gres=lscratch:10                                         \
         --logdir=${cdir_log}                                       \
         --job-name=job_${cmd}                                      \
