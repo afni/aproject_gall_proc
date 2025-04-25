@@ -10,7 +10,7 @@ scripts.
 
 --------------------------------------------------------------------------
 
-**do_13_ssw2.tcsh, run_13_ssw2.tcsh**
+**do_13_ssw.tcsh, run_13_ssw.tcsh**
 
 * Run sswarper2 on the anatomical dataset to:
   * make a skullstripped (SS) version

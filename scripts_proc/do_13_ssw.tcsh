@@ -1,6 +1,6 @@
 #!/bin/tcsh
 
-# DESC: run anat through skullstripping and warping (SSW2)
+# DESC: run anat through skullstripping and warping (SSW)
 
 # Process a single subj. Run it from its partner run*.tcsh script.
 # Run on a slurm/swarm system (like Biowulf) or on a desktop.
@@ -38,20 +38,20 @@ set subj           = $1
 set dir_inroot     = ${PWD:h}                        # one dir above scripts/
 set dir_log        = ${dir_inroot}/logs
 set dir_basic      = ${dir_inroot}/data_03_slice_tree  # not usual 00_basic
-set dir_ssw2       = ${dir_inroot}/data_13_ssw2
+set dir_ssw        = ${dir_inroot}/data_13_ssw
 
 # subject directories
 set sdir_basic     = ${dir_basic}/${subj}
 set sdir_func      = ${sdir_basic}/func
 set sdir_anat      = ${sdir_basic}/anat
-set sdir_ssw2      = ${dir_ssw2}/${subj}
+set sdir_ssw       = ${dir_ssw}/${subj}
 
 # supplementary directory (reference data, etc.)
 ###set dir_suppl      = ${dir_inroot}/supplements
 set template       = MNI152_2009_template_SSW.nii.gz
 
 # *** set output directory
-set sdir_out = ${sdir_ssw2}
+set sdir_out = ${sdir_ssw}
 set lab_out  = ${sdir_out:t}
 
 # --------------------------------------------------------------------------

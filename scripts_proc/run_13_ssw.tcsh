@@ -1,6 +1,6 @@
 #!/bin/tcsh
 
-# DESC: run anat through skullstripping and warping (SSW2)
+# DESC: run anat through skullstripping and warping (SSW)
 
 # Process one or more subjects via corresponding do_*.tcsh script,
 # looping over subj.
@@ -17,7 +17,7 @@ set use_slurm = $?SLURM_CLUSTER_NAME
 # --------------------------------------------------------------------------
 
 # specify script to execute
-set cmd           = 13_ssw2
+set cmd           = 13_ssw
 
 # upper directories
 set dir_scr       = $PWD

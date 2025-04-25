@@ -38,14 +38,14 @@ set subj           = $1
 set dir_inroot     = ${PWD:h}                        # one dir above scripts/
 set dir_log        = ${dir_inroot}/logs
 set dir_basic      = ${dir_inroot}/data_03_slice_tree  # not usual 00_basic
-set dir_ssw2       = ${dir_inroot}/data_13_ssw2
+set dir_ssw        = ${dir_inroot}/data_13_ssw
 set dir_ap         = ${dir_inroot}/data_21_ap
 
 # subject directories
 set sdir_basic     = ${dir_basic}/${subj}
 set sdir_func      = ${sdir_basic}/func
 set sdir_anat      = ${sdir_basic}/anat
-set sdir_ssw2      = ${dir_ssw2}/${subj}
+set sdir_ssw       = ${dir_ssw}/${subj}
 set sdir_ap        = ${dir_ap}/${subj}
 
 # supplementary directory (reference data, etc.)
@@ -66,12 +66,12 @@ set taskname  = "Move"
 
 set dset_epi  = ( ${sdir_func}/${subj}*task-${taskname}*bold*.nii.gz )
 
-set anat_cp       = ( ${sdir_ssw2}/anatSS.${subj}.nii* )
-set anat_skull    = ( ${sdir_ssw2}/anatU.${subj}.nii* )
+set anat_cp       = ( ${sdir_ssw}/anatSS.${subj}.nii* )
+set anat_skull    = ( ${sdir_ssw}/anatU.${subj}.nii* )
 
-set dsets_NL_warp = ( ${sdir_ssw2}/anatQQ.${subj}.nii*         \
-                      ${sdir_ssw2}/anatQQ.${subj}.aff12.1D     \
-                      ${sdir_ssw2}/anatQQ.${subj}_WARP.nii*  )
+set dsets_NL_warp = ( ${sdir_ssw}/anatQQ.${subj}.nii*         \
+                      ${sdir_ssw}/anatQQ.${subj}.aff12.1D     \
+                      ${sdir_ssw}/anatQQ.${subj}_WARP.nii*  )
 
 # control variables
 
