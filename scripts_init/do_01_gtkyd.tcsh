@@ -93,9 +93,9 @@ cd ${dir_basic}
 # ----- check EPI
 
 # make table+supplements of all dsets
-gtkyd_check.py                                       \
-    -do_minmax                                       \
-    -infiles    ${all_epi}                           \
+gtkyd_check.py                                         \
+    -do_minmax                                         \
+    -infiles    ${all_epi}                             \
     -outdir     ${sdir_out}/all_epi
 
 if ( ${status} ) then
@@ -104,13 +104,14 @@ if ( ${status} ) then
 endif
 
 # query supplemental files for specific properties
-gen_ss_review_table.py                               \
-    -infiles          ${sdir_out}/all_epi/dset*txt   \
-    -report_outliers  'subject ID'     SHOW          \
-    -report_outliers  'av_space'       EQ "+tlrc"    \
-    -report_outliers  'n3'             VARY          \
-    -report_outliers  'nv'             VARY          \
-    -report_outliers  'datum'          VARY          \
+gen_ss_review_table.py                                 \
+    -outlier_sep space                                 \
+    -infiles            ${sdir_out}/all_epi/dset*txt   \
+    -report_outliers    'subject ID'     SHOW          \
+    -report_outliers    'av_space'       EQ "+tlrc"    \
+    -report_outliers    'n3'             VARY          \
+    -report_outliers    'nv'             VARY          \
+    -report_outliers    'datum'          VARY          \
     |& tee ${sdir_out}/all_epi_gssrt.dat
 
 if ( ${status} ) then
@@ -121,9 +122,9 @@ endif
 # ----- check anat
 
 # make table+supplements of all dsets
-gtkyd_check.py                                       \
-    -do_minmax                                       \
-    -infiles    ${all_anat}                          \
+gtkyd_check.py                                         \
+    -do_minmax                                         \
+    -infiles    ${all_anat}                            \
     -outdir     ${sdir_out}/all_anat
 
 if ( ${status} ) then
@@ -132,15 +133,16 @@ if ( ${status} ) then
 endif
 
 # query supplemental files for specific properties
-gen_ss_review_table.py                               \
-    -infiles          ${sdir_out}/all_anat/dset*txt  \
-    -report_outliers  'subject ID'     SHOW          \
-    -report_outliers  'is_oblique'     GT 0          \
-    -report_outliers  'obliquity'      GT 0          \
-    -report_outliers  'av_space'       EQ "+tlrc"    \
-    -report_outliers  'n3'             VARY          \
-    -report_outliers  'nv'             VARY          \
-    -report_outliers  'datum'          VARY          \
+gen_ss_review_table.py                                 \
+    -outlier_sep space                                 \
+    -infiles            ${sdir_out}/all_anat/dset*txt  \
+    -report_outliers    'subject ID'     SHOW          \
+    -report_outliers    'is_oblique'     GT 0          \
+    -report_outliers    'obliquity'      GT 0          \
+    -report_outliers    'av_space'       EQ "+tlrc"    \
+    -report_outliers    'n3'             VARY          \
+    -report_outliers    'nv'             VARY          \
+    -report_outliers    'datum'          VARY          \
     |& tee ${sdir_out}/all_anat_gssrt.dat
 
 if ( ${status} ) then
